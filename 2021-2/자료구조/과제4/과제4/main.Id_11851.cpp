@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "poly.h"
+
+
+typedef struct NODE {
+	double coef;
+	int expon;
+	struct NODE* link;
+}NODE;
+
+typedef struct NODELINK { //³ëµåµéÀ» ¿¬°áÇØÁÖ±â À§ÇÑ ±¸Á¶Ã¼
+	struct NODE* head;
+	struct NODE* tail;
+}NODELINK;
+
+
+void append(NODELINK* poly, double coef, int expon) {
+
+	NODE* p = (NODE*)malloc(sizeof(NODE)); //»õ ³ëµå¸¦ µ¿ÀûÀ¸·Î »ý¼º 
+
+	p->coef = coef;
+	p->expon = expon;
+
+	if (poly->head == NULL) { // ¸®½ºÆ®°¡ ºñ¾î ÀÖÀ¸¸é
+		poly->head = p; // »õ·Î¿î ³ëµå¸¦ Ã¹¹øÂ° ³ëµå·Î ¸¸µç´Ù.
+	}
+	else { // ¸®½ºÆ®°¡ ºñ¾î ÀÖÁö ¾ÊÀ¸¸é
+		poly->tail->link = p;// »õ·Î¿î ³ëµå¸¦ ÀÌÀü ³ëµåÀÇ ³¡¿¡
+
+	}
+	p->link = NULL; // »õ·Î¿î ³ëµåÀÇ ¸µÅ© ÇÊµå¸¦ NULL·Î ¼³Á¤
+	poly->tail = p;
+}
+
+void erase(NODELINK* poly) { //³ëµå¸¦ Áö¿öÁØ´Ù //Ã¹ ³ëµåºÎÅÍ ¸ðµÎ Áö¿ò
+	NODE* p = poly->head;
+	NODE* next;
+	while (p != NULL)
+	{
+		next = p->link;
+		free(p);
+		p = next;
+	}
+}
+
+/*Ç×À» Å©±â¼øÀ¸·Î Á¤·ÄÇÏ´Â ÇÔ¼ö Ãß°¡ ÀÛ¼º*/
+void sort(NODELINK* poly) {
+	NODE* p = poly->head;
+	NODE* pp = p->link;
+	double tem_coef;
+	double tem_expon;
+
+	while (p != NULL) {
+		pp = p->link;
+		while (pp != NULL) {
+			if (p->expon < pp->expon) {
+				tem_coef = p->coef;
+				tem_expon = p->expon;
+				p->coef = pp->coef;
+				p->expon = pp->expon;
+				pp->coef = tem_coef;
+				pp->expon = tem_expon;
+			}
+			pp = pp->link;
+		}
+		p = p->link;
+
+	}
+}
+/*¿øÇü ¸µÅ©µå ¸®½ºÆ® -> Ç×ÀÇ ¾ÕµÚÀÇ Ç× Á¤º¸¸¦ °¡Áö°í ÀÖÀ½ -> ÇÑ ¹ø Á¤·Ä ÇÑ ´ÙÀ½¿£ ±»ÀÌ ¸ðµç ºñ±³ ÇÊ¿ä ¾øÀ»Áöµµ?...*/
+
+void print(NODELINK* poly) {
+	NODE* p = poly->head; //p°¡ ¿¬°á¸®½ºÆ®ÀÇ °¡Àå Ã¹¹øÂ° ³ëµå headºÎÅÍ °¡¸£Å´
+	printf("f(x)=");
+
+	while (p != NULL) //p°¡ ´õÀÌ»ó °¡¸£Å³ ³ëµå°¡ ¾øÀ» ¶§±îÁö
+	{
+		printf("+(%fx^%d)",  p->coef, p->expon);
+		p = p->link; //node->head->link ¿Í µ¿ÀÏ
+	}
+	printf("\n");
+}
+
+/*´ÙÇ×½ÄÀÇ µ¡¼À*/
+NODELINK *poly_add(NODELINK *a, NODELINK *b) { //´ÙÇ

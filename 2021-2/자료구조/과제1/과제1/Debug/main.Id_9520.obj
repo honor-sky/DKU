@@ -1,0 +1,329 @@
+#등분산 검정
+var_eq<-c()
+for(i in c(2:18)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(new_data[,i]~new_data$clas_re,data=new_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq<-TRUE}else{
+var_eq<-FALSE
+}
+}
+library(FSelector)
+library(caret)
+library(e1071)  # svm
+library(randomForest)
+library(class)
+library(cvTools)
+library(MASS)
+library(tidyverse)
+library(cluster)
+source("D:/단국대학교/연구실/빅데이터안과진단기술/수행과제/Feature 합성/공부자료(신현석)/nni_tools.R")
+vf_oct<-read.csv("D:/단국대학교/연구실/빅데이터안과진단기술/수행과제/clean_dataset/vf_oct_clean_210817.csv")
+#feature selection(1차)
+f1_select<-c("Avg_RNFL_Thickness_value","Avg_RNFL_Thickness_p_v","RNFL_S","RNFL_S_m_v",
+"Avg_RNFL_Thickness_p","Zone4","Zone4_m_v","Avg_RNFL_Thickness_p_p",
+"Zone4_p","Zone2","Zone2_m_v","RNFL_I","RNFL_I_m_v","Zone4_m_p","RNFL_S_p",
+"RNFL_I_p","Minimum.GCL.IPL.Thickness","RNFL_I_m_p","Zone2_m_p","Zone2_p",
+"RNFL_S_m_p","VFI","PSD","Average.GCL.IPL.Thickness","Zone1","Zone1_m_v",
+"GHT","Vertical.C.D_value","Vertical.C.D_p_v","Rim.Area_m_v","MD","Rim.Area_value",
+"Zone3","Zone3_m_v","Zone1_p","Zone1_m_p","Zone3_p","Vertical.C.D_p","Rim.Area_p",
+"Average.C.D_value", "Average.C.D_p_v","Zone3_m_p","Average.C.D_p","Vertical.C.D_p_p",
+"RNFL_T","RNFL_T_m_v","Zone6")
+data1<-cbind(vf_oct[,3],vf_oct[,f1_select])
+names(data1)[1]<-"cl"
+data1<-data1[complete.cases(data1),] #결측값 제거
+data1[,"RNFL_S"]<-as.numeric(data1[,"RNFL_S"])
+data1[,"RNFL_S_p"]<-as.numeric(data1[,"RNFL_S_p"])
+proc_data<-set.data(data1, idx_cl = 1)
+head(proc_data)
+#합성 feature
+NNI <- get.NNI(proc_data, K=5) # NNI
+WNI <- get.WNI(proc_data, K=5) # WNI
+loc <- get.loc(proc_data)      #loc
+rsum <- get.rowsum(proc_data)  # rsum
+dist <- get.dist(proc_data)    # dist
+#feature selection(2차)
+newset <- scale(data.frame(NNI, WNI, loc, rsum))
+f2_select<-c("Avg_RNFL_Thickness_value","Avg_RNFL_Thickness_p_v","RNFL_S",
+"RNFL_S_m_v","Avg_RNFL_Thickness_p","Zone4","Zone4_m_v","Avg_RNFL_Thickness_p_p",
+"Zone4_p","Zone2","Zone2_m_v","RNFL_I","RNFL_I_m_v","Zone4_m_p")
+#데이터셋 생성
+dataset<-cbind(data1[,1],data1[,f2_select])
+names(dataset)[1]<-"label"
+dataset<-cbind(dataset,newset)
+head(dataset)
+#결측값 제거
+dataset<-dataset[complete.cases(dataset),]
+nrow(dataset)
+####모델####
+set.seed(124)
+folds <- cvFolds(nrow(dataset), K=5)
+mis_result<-c() #오분류 데이터 인덱스 저장
+rig_result<-c() #정상분류 데이터 인덱스 저장
+for(i in c(1:5)){
+ts.idx<-folds$subset[which(folds$which==i)] #몇번째 row인지
+ds.train <- dataset[-ts.idx,-1]
+ds.test <-  dataset[ts.idx,-1]
+cl.train <- dataset[-ts.idx,1]
+cl.test <- dataset[ts.idx,1]
+head(dataset)
+model <- randomForest(ds.train, cl.train, ntree=400)
+pred <- round(predict(model, ds.test),0) #예측
+pred_value<-as.factor(as.matrix(pred))
+pre_result<-(pred_value==cl.test)
+for(k in 1:length(pred_value)){
+if(pre_result[k]){
+rig_result <- cbind(rig_result,rownames(ds.test[k,]))
+}else{
+mis_result <- cbind(mis_result,rownames(ds.test[k,])) #잘못 예측한 데이터의 실제 인덱스를 저장
+}
+}
+}
+mis_result<-as.vector(mis_result)
+rig_result<-as.vector(rig_result)
+library(ggplot2)
+library(UsingR)
+#오분류 데이터
+mis_data<-dataset[mis_result,]
+no_label_mis<-mis_data[,-1]
+mis_data$clas_re<-1
+head(mis_data)
+nrow(dataset)
+#정상분류 데이터
+rig_data<-dataset[rig_result,]
+no_label_ri<-rig_data[,-1]
+rig_data$clas_re<-0
+new_data<-rbind(rig_data,mis_data)
+#new_data<-new_data[c(order(new_data$rownames)),]
+nrow(new_data)
+head(new_data)
+#등분산 검정
+var_eq<-c()
+for(i in c(2:18)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(new_data[,i]~new_data$clas_re,data=new_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq<-TRUE}else{
+var_eq<-FALSE
+}
+}
+var_eq
+for(i in c(2:18)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(new_data[,i]~new_data$clas_re,data=new_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-TRUE}else{
+var_eq[i-1]<-FALSE
+}
+}
+var_eq
+nor_test<-c()
+for(i in c(2:18)){
+if(shapiro.test(new_data[,i]~new_data$clas_re)$p.value<0.01){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-"NN"}else{ #정규성 따르지 않은
+var_eq[i-1]<-"N"
+}
+}
+for(i in c(2:18)){
+if(shapiro.test(new_data[,i])$p.value<0.01){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-"NN"}else{ #정규성 따르지 않은
+var_eq[i-1]<-"N"
+}
+}
+nor_test
+nor_test<-c()
+for(i in c(2:18)){
+if(shapiro.test(new_data[,i])$p.value<0.01){ #p-value가 0.05이상이면 분산 동일(TRUE)
+nor_test[i-1]<-"NN"}else{ #정규성 따르지 않은
+nor_test[i-1]<-"N"
+}
+}
+#등분산 검정
+var_eq<-c()
+for(i in c(2:18)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(new_data[,i]~new_data$clas_re,data=new_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-TRUE}else{
+var_eq[i-1]<-FALSE
+}
+}
+nor_test
+#정규성 검사
+head(new_data)
+nor_test<-c()
+for(i in c(2:18)){
+if(shapiro.test(mis_data[,i])$p.value<0.01){ #p-value가 0.05이상이면 분산 동일(TRUE)
+nor_test[i-1]<-"NN"}else{ #정규성 따르지 않은
+nor_test[i-1]<-"N"
+}
+}
+nor_test
+nor_test<-c()
+for(i in c(2:18)){
+if(shapiro.test(rig_data[,i])$p.value<0.01){ #p-value가 0.05이상이면 분산 동일(TRUE)
+nor_test[i-1]<-"NN"}else{ #정규성 따르지 않은
+nor_test[i-1]<-"N"
+}
+}
+nor_test
+nor_test<-c()
+for(i in c(2:19)){
+if(shapiro.test(rig_data[,i])$p.value<0.01){ #p-value가 0.05이상이면 분산 동일(TRUE)
+nor_test[i-1]<-"NN"}else{ #정규성 따르지 않은
+nor_test[i-1]<-"N"
+}
+}
+#등분산 검정
+var_eq<-c()
+for(i in c(2:19)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(new_data[,i]~new_data$clas_re,data=new_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-TRUE}else{
+var_eq[i-1]<-FALSE
+}
+}
+nor_test
+#등분산 검정
+var_eq<-c()
+for(i in c(2:19)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(mis_data[,i]~mis_data$clas_re,data=mis_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-TRUE}else{
+var_eq[i-1]<-FALSE
+}
+}
+var_eq
+#등분산 검정
+var_eq<-c()
+for(i in c(2:19)){
+#분산동질성(F-value) 검증 후, 적절한 var.equal 옵션을 사용해야 함
+#TRUE -> two sample student's t-test
+#FALSE -> welch's t-test
+if(var.test(new_data[,i]~new_data$clas_re,data=new_data)$p.value>0.05){ #p-value가 0.05이상이면 분산 동일(TRUE)
+var_eq[i-1]<-TRUE}else{
+var_eq[i-1]<-FALSE
+}
+}
+var_eq
+names(no_label_mis)
+t_g<-matrix("",nrow=ncol(no_label_mis),ncol=2)
+rownames(t_g)<-names(no_label_mis)
+colnames(t_g)<-c("rig","mis")
+t_g
+i<-2
+by(new_data[,i]~new_data$clas_re,shapiro.test)
+by(new_data[,i],new_data$clas_re,shapiro.test)
+by(new_data[,i],new_data$clas_re,shapiro.test)$p-value
+by(new_data[,i],new_data$clas_re,shapiro.test)$p-value
+by(new_data[,i],new_data$clas_re,shapiro.test)$[2]
+by(new_data[,i],new_data$clas_re,shapiro.test)$p-value
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1][2]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1][1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1][1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]$esrimate
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]$estimate
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]$value
+by(new_data[,i],new_data$clas_re,shapiro.test)[1,2
+by(new_data[,i],new_data$clas_re,shapiro.test)[1,2]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1,1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[2]
+by(new_data[,i],new_data$clas_re,shapiro.test)[2]$"w"
+by(new_data[,i],new_data$clas_re,shapiro.test)[2]$w
+i<-2
+t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)
+t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[1]
+t_g<-matrix("",nrow=ncol(no_label_mis),ncol=2)
+rownames(t_g)<-names(no_label_mis)
+colnames(t_g)<-c("rig","mis")
+for(i in 2:19){
+t_g[i-1,1]<-t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[1]
+t_g[i-1,2]<-t.test(new_data[,i]~label,
+data=clas_re,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[2]
+}
+t_g<-matrix("",nrow=ncol(no_label_mis),ncol=2)
+rownames(t_g)<-names(no_label_mis)
+colnames(t_g)<-c("rig","mis")
+for(i in 2:19){
+t_g[i-1,1]<-t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[1]
+t_g[i-1,2]<-t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[2]
+}
+t_g
+i<-2
+t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$p-value
+t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$df
+t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate
+t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$p.value
+t_g<-matrix("",nrow=ncol(no_label_mis),ncol=3)
+rownames(t_g)<-names(no_label_mis)
+colnames(t_g)<-c("rig","mis","p-value")
+for(i in 2:19){
+t_g[i-1,1]<-t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[1]
+t_g[i-1,2]<-t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$estimate[2]
+t_g[i-1,3]<-t.test(new_data[,i]~clas_re,
+data=new_data,
+alternative = c("two.sided"),
+var.equal=FALSE)$p.value
+}
+t_g
+t_g
+i<-2
+by(new_data[,i],new_data$clas_re,shapiro.test)[2]$p.value
+by(new_data[,i],new_data$clas_re,shapiro.test)[2]
+by(new_data[,i],new_data$clas_re,shapiro.test)$p.value
+by(new_data[,i],new_data$clas_re,shapiro.test)[2."p.value"]
+by(new_data[,i],new_data$clas_re,shapiro.test)[2,"p.value"]
+by(new_data[,i],new_data$clas_re,shapiro.test)$2
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]$p.value
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]$p.value
+by(new_data[,i],new_data$clas_re,shapiro.test)[1,]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1][,]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]
+by(new_data[,i],new_data$clas_re,shapiro.test)[1]$p.value
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

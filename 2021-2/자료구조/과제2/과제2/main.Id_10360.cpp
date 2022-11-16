@@ -1,0 +1,3 @@
+{\rtf1\adeflang1025\ansi\ansicpg949\uc2\adeff0\deff0\stshfdbch31505\stshfloch31506\stshfhich31506\stshfbi0\deflang1033\deflangfe1042\themelang1033\themelangfe1042\themelangcs0{\fonttbl{\f0\fbidi \froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman;}{\f34\fbidi \froman\fcharset0\fprq2{\*\panose 02040503050406030204}Cambria Math;}
+{\f42\fbidi \fmodern\fcharset129\fprq2{\*\panose 020b0503020000020004}\'b8\'bc\'c0\'ba \'b0\'ed\'b5\'f1;}{\f44\fbidi \fmodern\fcharset129\fprq2 @\'b8\'bc\'c0\'ba \'b0\'ed\'b5\'f1;}
+{\f46\fbidi \fmodern\fcharset129\fprq1{\*\panose 020b0609000101010101}\'b5\'b8\'bf\'f2\'c3\'bc;}{\f169\fbidi \fmodern\fcharset129\fprq1 @\'b5\

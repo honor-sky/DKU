@@ -1,0 +1,11 @@
+%PDF-1.4
+%‚„œ”
+7 0 obj
+<<
+/N 3
+/Alternate /DeviceRGB
+/Length 2612
+/Filter /FlateDecode
+>>
+stream
+xùñwTSŸáœΩ7Ω–" %Ùz	 “;HQâIÄPÜÑ&vDF

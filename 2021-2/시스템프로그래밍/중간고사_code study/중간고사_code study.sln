@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "중간고사_code study", "중간고사_code study\중간고사_code study.vcxproj", "{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Debug|x64.ActiveCfg = Debug|x64
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Debug|x64.Build.0 = Debug|x64
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Debug|x86.ActiveCfg = Debug|Win32
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Debug|x86.Build.0 = Debug|Win32
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Release|x64.ActiveCfg = Release|x64
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Release|x64.Build.0 = Release|x64
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Release|x86.ActiveCfg = Release|Win32
+		{71DFE659-D92A-44FD-B5D4-4E8A88D76B5D}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C89B95CB-89BA-47F0-9DB9-D117C1669ECB}
+	EndGlobalSection
+EndGlobal

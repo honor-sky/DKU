@@ -1,0 +1,15 @@
+# -- Load library --
+install.packages("Ckmeans.1d.dp")
+library(xgboost) # xgboost
+library(tidyverse) # for select and pipe operation
+library(caret) #for confusion matrix
+library(igraph)
+#-- Set Working Directory --
+setwd("D:/단국대학교/연구실/글로벌 핵심인재 양성/라이프로그 대사증후군 진단/5월 논문 준비/CBFI source code")
+source("CB_FeatureImp.r")
+source("CB_FeatureInteract.r")
+source("CB_FItable.r")
+source("CB_plot.contribute.r")
+source("CB_plot.FIgraph.r")
+source("CB_plot.imp.r")
+source("CB_

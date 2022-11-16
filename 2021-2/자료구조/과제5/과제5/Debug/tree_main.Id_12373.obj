@@ -1,0 +1,38 @@
+#pragma warning(disable:4996)
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAX 100
+#define alph_num 26
+
+//트리 노드
+typedef struct node
+{
+	char alphabet;  //알파벳
+	int freq;//빈도수
+	struct node* left; //왼쪽 자식 노드
+	struct node* right; //오른쪽 자식 노드
+}node;
+
+
+
+//새 노드 생성
+node* makenode(char alphabet, int freq, struct node* left, struct node* right)
+{
+	node* new_node = (node*)malloc(sizeof(node));
+	new_node->alphabet = alphabet;
+	new_node->freq = freq;
+	new_node->left = left;
+	new_node->right = right;
+	return new_node;
+}
+
+//허프만 코드 트리 생성(압축하고자 하는 문자열)
+node* make_Huffman_tree(char arr[])
+{
+	int i = 0;
+	int j;
+	int temp_n = 0;
+	int min = 0;  //제일 빈도수가 작은 index
+	int min2 = 0; //두 번째로 빈도수가 작은 index
+	int fre[alph_num] = { 0 };  //알파

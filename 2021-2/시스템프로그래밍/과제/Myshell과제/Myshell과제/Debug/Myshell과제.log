@@ -1,0 +1,5 @@
+﻿  main.cpp
+D:\단국대학교\2021-2\시스템프로그래밍\Myshell과제\Myshell과제\main.cpp(33,16): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+D:\단국대학교\2021-2\시스템프로그래밍\Myshell과제\Myshell과제\main.cpp(29,16): warning C4101: 'status' :참조되지 않은 지역 변수입니다.
+D:\단국대학교\2021-2\시스템프로그래밍\Myshell과제\Myshell과제\main.cpp(29,9): warning C4101: 'child' :참조되지 않은 지역 변수입니다.
+  Myshell과제.vcxproj -> D:\단국대학교\2021-2\시스템프로그래밍\Myshell과제\Debug\Myshell과제.exe

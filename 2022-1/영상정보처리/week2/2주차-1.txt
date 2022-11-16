@@ -1,0 +1,28 @@
+resolution: 1인치 안에 몇 개의 픽셀이 들어있는지(PPI 따져야 함)
+png : loss less -> 작업할 땐 이게 더 좋음
+jpeg : loss(저장 시 압축이 일어나며 loss)
+TIFF: 이미지 document 붙여 쓸 때 종종 사용
+
+사진의 부분 = ROI(Region of image)
+
+이미지 읽기
+img = cv2.imread("")
+
+이미지 계속 보이게 하지
+cv2.waitKey(milliseconds)
+
+튜플 체크!
+
+b = img[6,40,0] => 픽셀 하나의 b 값만 뽑음
+
+from google.colab import drive
+drive.mount('/gdrive')
+=>user mode와 kernel mode 디렉토리 맞춰줌
+
+%cd /gdrive/My\ Drive
+%cd /clasroom
+....
+동근이 파일 전까지 쭉 내려가서 path 맞춰줌
+
+
+
