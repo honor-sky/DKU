@@ -1,0 +1,56 @@
+
+<html>
+    {% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>MINI_kyung website</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/template_index.css'}">
+</head>
+<body>
+<div id="container">
+    <header id="header">
+        <!--<p style="color:black;font-family:HSYuji-Regular;font-size:30pxfont:bold; position:fixed; top:10px; left:30px;">GANG MINI_HOMPY</p>-->
+        <div id="menu">
+            <ul style="list-style-type: none;">
+                <li class="active"><a href="#"><span style="color:black;font-family:HSYuji-Regular;font-size:20px;position:fixed;top:50px;left:150px;" />Introduction</a>  </li>
+                <li><a href="./gangmini_hompy/project.html"><span style="color:black;font-size:20px;position:fixed;top:50px;left:700px;"/>Project</a> </li>
+                <li><a href="./gangmini_hompy/study.html"><span style="color:black;font-size:20px;position:fixed;top:50px;left:1250px;"/>Study</a></li>
+            </ul>
+        </div>
+    </header>
+    <section id ="contents1">
+        <div>
+            <img src="{%static 'img/배너3.jpg' %}" width="100%" height="400px"  alt="main_pic" title="main_pic" align="center">
+		  <span style="color:white;font-family:HSYuji-Regular;font-size:30px;position:absolute;left:1100px;top:180px;">GANG MINI_HOMPY</span>
+        </div>
+    </section>
+    <section id ="contents2">
+        <div id="slideShow">
+            <ul class="slides" style="position:absolute; left:450px;">
+                <li><img src="{%static 'img/flower.jpg' %}" width=600px; alt=""></li>
+                <!--<li><img src="{%static 'img/gyoungsoton.jpg' %}" width=600px; alt=""></li>-->
+            </ul>
+            <p class="controller">
+                <!-- &lang: 왼쪽 방향 화살표 &rang: 오른쪽 방향 화살표
+                <span class="prev">&lang;</span>
+                <span class="next">&rang;</span>-->
+            </p>
+        </div>
+        <script src="{% static 'js/slideShow.js' %}"></script>
+
+        <ul style="position:absolute; left:480px; top:700px; color:black;font-family:HSYuji-Regular;font-size:15px;">
+            <br/>
+            <li>Name: Kim Kyungmin</li>
+            <li>E-mail: keung903@naver.com</li>
+            <li>Phone: 010-8328-xxxx</li>
+            <li>Instrgram: @kkaebangjung_danvung</li>
+            <li>Blog:<a href=" https://studyroadmap-kkm.tistory.com/"> https://studyroadmap-kkm.tistory.com/</a></li>
+            <li>Profession: Undergraduate Student in Dankook University<br/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                            Undergraduate researcher in Bio-Information Technology Lab(BITL)</li>
+            <br/>
+            <br/>
+        </ul>
+    </section>
+</div>
+</body>
+</html>
